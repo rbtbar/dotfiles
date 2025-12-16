@@ -1,0 +1,160 @@
+# ============================================================================
+# ~/.zshrc - Zsh Configuration
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# PATH early tweaks (user bins)
+# ----------------------------------------------------------------------------
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# ----------------------------------------------------------------------------
+# Homebrew (Apple Silicon)
+# (bootstrap script also writes this into ~/.zprofile for login shells)
+# ----------------------------------------------------------------------------
+if [[ -d /opt/homebrew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# ============================================================================
+# PROMPT CONFIGURATION - oh-my-posh
+# ============================================================================
+# Cross-platform prompt theme engine
+# Using 'spaceship' theme (config in ~/.config/oh-my-posh/spaceship.omp.json)
+if command -v oh-my-posh >/dev/null 2>&1; then
+  if [[ -f "$HOME/.config/oh-my-posh/spaceship.omp.json" ]]; then
+    eval "$(oh-my-posh init zsh --config "$HOME/.config/oh-my-posh/spaceship.omp.json")"
+  else
+    eval "$(oh-my-posh init zsh)"
+  fi
+fi
+
+# ============================================================================
+# ENVIRONMENT MANAGER - direnv
+# ============================================================================
+# Automatically load/unload environment variables based on .envrc files
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
+# ============================================================================
+# PYTHON VERSION MANAGER - pyenv
+# ============================================================================
+if command -v pyenv >/dev/null 2>&1; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
+
+# ============================================================================
+# NODE VERSION MANAGER - fnm
+# ============================================================================
+# (Add `brew install fnm` to your bootstrap if you want this always available)
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd)"
+fi
+
+# ============================================================================
+# HISTORY CONFIGURATION
+# ============================================================================
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+
+setopt APPEND_HISTORY        # append, don't overwrite
+setopt INC_APPEND_HISTORY    # write history immediately
+setopt SHARE_HISTORY         # share history between sessions
+setopt HIST_IGNORE_ALL_DUPS  # remove older duplicates
+setopt HIST_IGNORE_SPACE     # commands starting with space are not saved
+setopt HIST_REDUCE_BLANKS    # strip extra blanks
+
+# ============================================================================
+# FUZZY FINDER - fzf
+# ============================================================================
+# Load fzf if installed (Homebrew version usually sets this up)
+if [[ -f "$HOME/.fzf.zsh" ]]; then
+  source "$HOME/.fzf.zsh"
+fi
+
+# FZF defaults
+export FZF_DEFAULT_OPTS="
+  --height 100%
+  --layout=reverse
+  --border
+  --info=inline
+  --color=prompt:6,marker:2,spinner:5
+  --preview='echo {}'
+"
+
+# Use fd instead of find for file search (faster, respects .gitignore)
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
+# Enhanced history search with bat preview (if bat present)
+if command -v bat >/dev/null 2>&1; then
+  export FZF_CTRL_R_OPTS="
+    --preview 'echo {} | bat --style=numbers,plain --language=sh --color=always'
+    --preview-window=up:5:wrap
+    --bind 'ctrl-/:toggle-preview'
+    --color header:italic
+    --tiebreak=begin,index --no-sort --exact --algo=v2
+  "
+fi
+
+# ============================================================================
+# ALIASES - Modern CLI Tool Replacements
+# ============================================================================
+alias ssh="ssh -F $HOME/.ssh/config"
+
+if command -v bat >/dev/null 2>&1; then
+  alias cat="bat"
+fi
+
+if command -v fd >/dev/null 2>&1; then
+  alias find="fd"
+fi
+
+if command -v eza >/dev/null 2>&1; then
+  alias ls="eza --icons=always"
+fi
+
+# ============================================================================
+# ZSH ENHANCEMENTS
+# ============================================================================
+# Syntax highlighting
+if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Auto-suggestions
+if [[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+# ============================================================================
+# COMPLETION SYSTEM
+# ============================================================================
+# Load completions from Homebrew and Docker (if available)
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix 2>/dev/null)"
+  if [[ -d "$BREW_PREFIX/share/zsh-completions" ]]; then
+    fpath=("$BREW_PREFIX/share/zsh-completions" $fpath)
+  fi
+fi
+
+if [[ -d "$HOME/.docker/completions" ]]; then
+  fpath=("$HOME/.docker/completions" $fpath)
+fi
+
+autoload -Uz compinit
+compinit
+
+# ============================================================================
+# SMART DIRECTORY NAVIGATION - zoxide
+# ============================================================================
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
