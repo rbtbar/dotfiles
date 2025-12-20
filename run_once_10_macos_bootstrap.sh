@@ -45,7 +45,9 @@ echo "[dotfiles] Installing CLI tools and extras..."
 brew install jq yq fd bat eza zoxide direnv
 
 # Zsh goodies
-brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf jandedobbeleer/oh-my-posh/oh-my-posh
+brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf
+
+brew install --formula jandedobbeleer/oh-my-posh/oh-my-posh
 
 # Dev tooling
 brew install go-task/tap/go-task uv autossh timeout gh pyenv fnm 
