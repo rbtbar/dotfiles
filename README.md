@@ -8,10 +8,10 @@ eval "$(ssh-agent -s)"
 
 ## Edit ~/.ssh/config
 
-Host *
+Host github.com
   AddKeysToAgent yes
   UseKeychain yes
-  IdentityFile ~/.ssh/id_ed25519_github
+  IdentityFile ~/.ssh/id_ed25519_gihub
 
 ## Add the key to the agent
 
