@@ -28,7 +28,9 @@ ssh -T git@github.com
 # dotfiles
 
 One-line binary and dotfiles install:
+
 export GITHUB_USERNAME=rbtbar
+
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply git@github.com:$GITHUB_USERNAME/dotfiles.git
 
 
