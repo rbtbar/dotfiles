@@ -33,4 +33,8 @@ export GITHUB_USERNAME=rbtbar
 
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply git@github.com:$GITHUB_USERNAME/dotfiles.git
 
+# Full reset
+
+rm -rf "$HOME/.config/chezmoi" && rm -rf "$HOME/.local/bin/chezmoi" && rm -rf "$HOME/.local/share/chezmoi"
+
 
