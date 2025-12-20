@@ -59,9 +59,16 @@ setopt HIST_REDUCE_BLANKS    # strip extra blanks
 # ============================================================================
 # FUZZY FINDER - fzf
 # ============================================================================
-# Load fzf if installed (Homebrew version usually sets this up)
-if [[ -f "$HOME/.fzf.zsh" ]]; then
-  source "$HOME/.fzf.zsh"
+
+# fzf keybindings & completion (Homebrew install)
+if command -v brew >/dev/null 2>&1; then
+  FZF_PREFIX="$(brew --prefix 2>/dev/null)/opt/fzf"
+  if [[ -f "$FZF_PREFIX/shell/key-bindings.zsh" ]]; then
+    source "$FZF_PREFIX/shell/key-bindings.zsh"
+  fi
+  if [[ -f "$FZF_PREFIX/shell/completion.zsh" ]]; then
+    source "$FZF_PREFIX/shell/completion.zsh"
+  fi
 fi
 
 # FZF defaults
