@@ -146,3 +146,21 @@ if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
 
+# ============================================================================
+# TMUX
+# ============================================================================
+
+# Generic: tmux session by name
+tm() {
+  local name="${1:-main}"
+  tmux new-session -A -s "$name"
+}
+
+# Remote tmux: rmt host [session]
+rmt() {
+  local host="$1"
+  local name="${2:-main}"
+  ssh "$host" -t "tmux new-session -A -s $name"
+}
+
+
