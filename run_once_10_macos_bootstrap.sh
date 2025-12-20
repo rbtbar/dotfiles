@@ -45,10 +45,10 @@ echo "[dotfiles] Installing CLI tools and extras..."
 brew install jq yq fd bat eza zoxide direnv
 
 # Zsh goodies
-brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf
+brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf jandedobbeleer/oh-my-posh/oh-my-posh
 
 # Dev tooling
-brew install go-task/tap/go-task uv autossh timeout gh pyenv jandedobbeleer/oh-my-posh/oh-my-posh
+brew install go-task/tap/go-task uv autossh timeout gh pyenv fnm 
 
 # Fonts (need cask-fonts tap)
 brew tap homebrew/cask-fonts || true
