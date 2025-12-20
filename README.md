@@ -11,7 +11,7 @@ eval "$(ssh-agent -s)"
 Host github.com
   AddKeysToAgent yes
   UseKeychain yes
-  IdentityFile ~/.ssh/id_ed25519_gihub
+  IdentityFile ~/.ssh/id_ed25519_github
 
 ## Add the key to the agent
 
