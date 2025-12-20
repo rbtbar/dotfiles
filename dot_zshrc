@@ -137,7 +137,7 @@ if [[ -d "$HOME/.docker/completions" ]]; then
 fi
 
 autoload -Uz compinit
-compinit
+compinit -u
 
 # ============================================================================
 # SMART DIRECTORY NAVIGATION - zoxide
