@@ -49,6 +49,9 @@ brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf
 
 brew install --formula jandedobbeleer/oh-my-posh/oh-my-posh
 
+# Tmux
+brew install tmux
+
 # Dev tooling
 brew install go-task/tap/go-task uv autossh gh pyenv fnm 
 
