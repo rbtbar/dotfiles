@@ -66,5 +66,7 @@ brew install --cask docker
 # Editor
 brew install neovim
 
+brew install ripgrep
+
 echo "[dotfiles] macOS bootstrap finished."
 
