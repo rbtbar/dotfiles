@@ -70,5 +70,29 @@ brew install ripgrep
 # Treesitter plugin
 brew install tree-sitter-cli
 
+# -----------------------------------------------------------
+# Neovim LSP servers (macOS, Homebrew + Node)
+# -----------------------------------------------------------
+
+# 1) Python LSP: Pyright
+
+brew install pyright
+
+# 2) Lua LSP: lua-language-server
+#    Homebrew formula ships the binary
+brew install lua-language-server
+
+# 3) TypeScript / JavaScript LSP: typescript-language-server
+brew install node
+npm install -g typescript typescript-language-server
+
+# -----------------------------------------------------------
+# Sanity-check that everything is on PATH
+# -----------------------------------------------------------
+pyright --version
+lua-language-server --version
+typescript-language-server --version
+node --version
+
 echo "[dotfiles] macOS bootstrap finished."
 
