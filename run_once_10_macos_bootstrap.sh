@@ -65,8 +65,10 @@ brew install --cask docker
 
 # Editor
 brew install neovim
-
+# Telescope plugin
 brew install ripgrep
+# Treesitter plugin
+brew install tree-sitter-cli
 
 echo "[dotfiles] macOS bootstrap finished."
 

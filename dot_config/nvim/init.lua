@@ -173,7 +173,16 @@ require("lazy").setup({
         vim.keymap.set("n", "<leader>fb", builtin.buffers, {
           desc = "Telescope: buffers",
         })
+        vim.keymap.set("n", "<leader>fh", builtin.help_tags, { 
+	  desc = "Telescope help tags",
+        })
       end,
+    },
+    -- Treesitter: better syntax highlighting / indentation
+    {
+      "nvim-treesitter/nvim-treesitter",
+      lazy = false,
+      build = ":TSUpdate",
     },
   },
 
@@ -189,4 +198,42 @@ require("lazy").setup({
     enabled = false,
   },
 })
+
+---------------------------------------------------------------------------
+-- Treesitter bootstrap: Lua + Python
+-- - installs parsers (async) if missing
+-- - enables Treesitter highlight + indent for these filetypes
+---------------------------------------------------------------------------
+
+do
+  -- Be defensive: don't blow up if the plugin is missing for some reason
+  local ok, ts = pcall(require, "nvim-treesitter")
+  if not ok then
+    return
+  end
+
+  -- Optional: configure install dir (we keep defaults, so this is not needed)
+  -- ts.setup({
+  --   install_dir = vim.fn.stdpath("data") .. "/site",
+  -- })
+
+  -- Install parsers for Lua & Python (async, no-op if already installed)
+  ts.install({ "lua", "python" })
+
+  -- Enable Treesitter on those filetypes
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "lua", "python" },
+    callback = function(args)
+      -- syntax highlighting & folds via core Neovim treesitter
+      vim.treesitter.start(args.buf)
+
+      -- Treesitter-based indentation via nvim-treesitter
+      vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+
+      -- If you want Treesitter folds too, uncomment:
+      -- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      -- vim.wo.foldmethod = "expr"
+    end,
+  })
+end
 
