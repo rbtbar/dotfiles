@@ -63,5 +63,8 @@ brew install --cask font-meslo-lg-nerd-font
 brew install --cask wezterm
 brew install --cask docker
 
+# Editor
+brew install neovim
+
 echo "[dotfiles] macOS bootstrap finished."
 
