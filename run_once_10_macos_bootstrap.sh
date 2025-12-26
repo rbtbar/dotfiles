@@ -54,6 +54,7 @@ brew install tmux
 
 # Dev tooling
 brew install go-task/tap/go-task uv autossh gh pyenv fnm 
+brew install lazygit
 
 # Fonts (need cask-fonts tap)
 brew tap homebrew/cask-fonts || true
@@ -77,6 +78,7 @@ brew install tree-sitter-cli
 # 1) Python LSP: Pyright
 
 brew install pyright
+brew install ruff black
 
 # 2) Lua LSP: lua-language-server
 #    Homebrew formula ships the binary
@@ -86,13 +88,20 @@ brew install lua-language-server
 brew install node
 npm install -g typescript typescript-language-server
 
-# -----------------------------------------------------------
-# Sanity-check that everything is on PATH
-# -----------------------------------------------------------
-pyright --version
-lua-language-server --version
-typescript-language-server --version
-node --version
+# 4) Yaml, JSON, docker, zsh/sh
+brew install \
+  yaml-language-server \
+  vscode-langservers-extracted \
+  docker-language-server \
+  bash-language-server
+
+# ------------------------------------------------------------ 
+# Python/Debugger installation
+# ------------------------------------------------------------ 
+pyenv install 3.14.2
+pyenv global 3.14.2
+python -m pip install --upgrade pip
+python -m pip install debugpy
 
 echo "[dotfiles] macOS bootstrap finished."
 
