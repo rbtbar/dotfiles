@@ -1,16 +1,76 @@
 -- ~/.config/nvim/init.lua
 -- ---------------------------------------------------------------------------
--- Minimal Neovim configuration
--- - No plugins
--- - Just sane defaults for editing, search, splits, undo, etc.
--- - Designed to be a good base for later adding plugins (LSP, tree, etc.)
+-- Neovim configuration
 -- ---------------------------------------------------------------------------
 
------------------------------
+---------------------------------------------------------------------------
 -- Leader key
------------------------------
--- <Space> will be the "leader" for custom mappings later, e.g. <Space>ff
+---------------------------------------------------------------------------
 vim.g.mapleader = " "
+
+---------------------------------------------------------------------------
+-- File / buffer basics
+---------------------------------------------------------------------------
+
+-- New empty buffer
+vim.keymap.set("n", "<leader>n", ":enew<CR>", { desc = "New empty buffer" })
+
+-- Save current buffer
+vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Write (save) buffer" })
+
+-- Close current buffer (keep window layout)
+vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Delete buffer" })
+
+-- Next / previous buffer
+vim.keymap.set("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" })
+
+-- Toggle between current and alternate buffer (built-in: <C-^>)
+vim.keymap.set("n", "<leader><Tab>", "<C-^>", { desc = "Alternate buffer" })
+
+---------------------------------------------------------------------------
+-- Delete current file from disk + close its buffer (with confirmation)
+---------------------------------------------------------------------------
+vim.keymap.set("n", "<leader>df", function()
+  local path = vim.fn.expand("%:p")
+  if path == "" then
+    vim.notify("No file name (buffer is not associated with a file)", vim.log.levels.WARN)
+    return
+  end
+
+  vim.ui.input({ prompt = "Delete file? " .. path .. " [y/N]: " }, function(input)
+    if input ~= "y" then
+      return
+    end
+
+    local ok, err = vim.loop.fs_unlink(path)
+    if not ok then
+      vim.notify("Failed to delete: " .. (err or ""), vim.log.levels.ERROR)
+      return
+    end
+
+    vim.cmd("bdelete")
+    vim.notify("Deleted " .. path)
+  end)
+end, { desc = "Delete file from disk" })
+
+---------------------------------------------------------------------------
+-- Window (split) management
+---------------------------------------------------------------------------
+
+-- Create splits
+vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Vertical split" })
+vim.keymap.set("n", "<leader>sh", ":split<CR>",  { desc = "Horizontal split" })
+
+-- Move between splits with Ctrl-h/j/k/l (like tmux / hjkl)
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
+
+-- Optional: equalize split sizes
+vim.keymap.set("n", "<leader>=", "<C-w>=", { desc = "Balance window sizes" })
+
 
 -----------------------------
 -- Line numbers
@@ -173,6 +233,7 @@ require("lazy").setup({
         vim.keymap.set("n", "<leader>fb", builtin.buffers, {
           desc = "Telescope: buffers",
         })
+        -- Search help tags
         vim.keymap.set("n", "<leader>fh", builtin.help_tags, {
           desc = "Telescope help tags",
         })
@@ -416,6 +477,72 @@ require("lazy").setup({
           }),
         })
       end,
+    },
+    -- Surround: add/change/delete surroundings like (), "", tags, etc.
+    {
+      "kylechui/nvim-surround",
+      version = "^3.0.0",      -- stable, per README
+      event = "VeryLazy",      -- loads on first real usage
+      config = function()
+        require("nvim-surround").setup({})
+      end,
+    },
+        -- Oil: file explorer that behaves like a normal buffer
+    {
+      "stevearc/oil.nvim",
+      lazy = false, -- author recommends not lazy-loading
+      dependencies = {
+        { "nvim-mini/mini.icons", opts = {} }, -- or "nvim-tree/nvim-web-devicons"
+      },
+      opts = {
+        default_file_explorer = true,  -- take over `nvim .` / editing directories
+        columns = { "icon" },
+        view_options = {
+          show_hidden = true,          -- I’d enable dotfiles by default
+        },
+      },
+      config = function(_, opts)
+        require("oil").setup(opts)
+
+        -- "Vinegar-style": go to parent dir of current file
+        vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Oil: parent directory" })
+
+        -- Quick open Oil in CWD
+        vim.keymap.set("n", "<leader>o", "<CMD>Oil<CR>", { desc = "Oil: open CWD" })
+      end,
+    },
+    -- Trouble: diagnostics / LSP / quickfix UI
+    {
+      "folke/trouble.nvim",
+      cmd = "Trouble",
+      opts = {},  -- defaults are good
+      keys = {
+        {
+          "<leader>xx",
+          "<cmd>Trouble diagnostics toggle<cr>",
+          desc = "Diagnostics (Trouble)",
+        },
+        {
+          "<leader>xX",
+          "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+          desc = "Buffer diagnostics (Trouble)",
+        },
+        {
+          "<leader>xs",
+          "<cmd>Trouble symbols toggle focus=false<cr>",
+          desc = "Document symbols (Trouble)",
+        },
+        {
+          "<leader>xl",
+          "<cmd>Trouble loclist toggle<cr>",
+          desc = "Location list (Trouble)",
+        },
+        {
+          "<leader>xq",
+          "<cmd>Trouble qflist toggle<cr>",
+          desc = "Quickfix list (Trouble)",
+        },
+      },
     },
   },
 

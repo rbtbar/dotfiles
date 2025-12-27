@@ -103,5 +103,11 @@ pyenv global 3.14.2
 python -m pip install --upgrade pip
 python -m pip install debugpy
 
+# ------------------------------------------------------------ 
+# Claude Code 
+# ------------------------------------------------------------ 
+
+curl -fsSL https://claude.ai/install.sh | bash
+
 echo "[dotfiles] macOS bootstrap finished."
 
