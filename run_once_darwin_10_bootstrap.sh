@@ -3,12 +3,6 @@ set -euo pipefail
 
 echo "[dotfiles] macOS bootstrap starting..."
 
-# Only run on macOS
-if [ "$(uname -s)" != "Darwin" ]; then
-  echo "[dotfiles] Not macOS, skipping Homebrew/bootstrap."
-  exit 0
-fi
-
 # ------------------------------------------------------------
 # Helper: install brew formula/cask only if not already installed
 # ------------------------------------------------------------

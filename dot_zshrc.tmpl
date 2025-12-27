@@ -2,6 +2,10 @@
 # ~/.zshrc - Zsh Configuration
 # ============================================================================
 
+{{ if eq .chezmoi.os "linux" -}}
+# Add ~/.local/bin to PATH (common install location on Linux)
+export PATH="$HOME/.local/bin:$PATH"
+{{ end -}}
 
 # ============================================================================
 # PROMPT CONFIGURATION - oh-my-posh
@@ -37,7 +41,10 @@ fi
 # ============================================================================
 # NODE VERSION MANAGER - fnm
 # ============================================================================
-# (Add `brew install fnm` to your bootstrap if you want this always available)
+{{ if eq .chezmoi.os "linux" -}}
+# fnm is installed to ~/.local/share/fnm on Linux
+export PATH="$HOME/.local/share/fnm:$PATH"
+{{ end -}}
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd)"
 fi
@@ -60,7 +67,8 @@ setopt HIST_REDUCE_BLANKS    # strip extra blanks
 # FUZZY FINDER - fzf
 # ============================================================================
 
-# fzf keybindings & completion (Homebrew install)
+# fzf keybindings & completion
+{{ if eq .chezmoi.os "darwin" -}}
 if command -v brew >/dev/null 2>&1; then
   FZF_PREFIX="$(brew --prefix 2>/dev/null)/opt/fzf"
   if [[ -f "$FZF_PREFIX/shell/key-bindings.zsh" ]]; then
@@ -70,6 +78,14 @@ if command -v brew >/dev/null 2>&1; then
     source "$FZF_PREFIX/shell/completion.zsh"
   fi
 fi
+{{ else if eq .chezmoi.os "linux" -}}
+if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+fi
+if [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
+  source /usr/share/doc/fzf/examples/completion.zsh
+fi
+{{ end -}}
 
 # FZF defaults
 export FZF_DEFAULT_OPTS="
@@ -122,27 +138,42 @@ fi
 # ============================================================================
 # ZSH ENHANCEMENTS
 # ============================================================================
-# Syntax highlighting
+{{ if eq .chezmoi.os "darwin" -}}
+# Syntax highlighting (Homebrew)
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
-# Auto-suggestions
+# Auto-suggestions (Homebrew)
 if [[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
+{{ else if eq .chezmoi.os "linux" -}}
+# Syntax highlighting (apt)
+if [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Auto-suggestions (apt)
+if [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+{{ end -}}
 
 # ============================================================================
 # COMPLETION SYSTEM
 # ============================================================================
-# Load completions from Homebrew and Docker (if available)
+{{ if eq .chezmoi.os "darwin" -}}
+# Load completions from Homebrew (macOS)
 if command -v brew >/dev/null 2>&1; then
   BREW_PREFIX="$(brew --prefix 2>/dev/null)"
   if [[ -d "$BREW_PREFIX/share/zsh-completions" ]]; then
     fpath=("$BREW_PREFIX/share/zsh-completions" $fpath)
   fi
 fi
+{{ end -}}
 
+# Docker completions
 if [[ -d "$HOME/.docker/completions" ]]; then
   fpath=("$HOME/.docker/completions" $fpath)
 fi
