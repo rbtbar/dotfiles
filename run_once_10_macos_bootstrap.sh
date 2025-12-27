@@ -9,105 +9,160 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 0
 fi
 
-# Install Homebrew if missing (Apple official script)
+# ------------------------------------------------------------
+# Helper: install brew formula/cask only if not already installed
+# ------------------------------------------------------------
+brew_install() {
+  local pkg="$1"
+  if ! brew list "$pkg" &>/dev/null; then
+    echo "[dotfiles] Installing $pkg..."
+    brew install "$pkg"
+  fi
+}
+
+brew_install_cask() {
+  local pkg="$1"
+  if ! brew list --cask "$pkg" &>/dev/null; then
+    echo "[dotfiles] Installing cask $pkg..."
+    brew install --cask "$pkg"
+  fi
+}
+
+npm_install_global() {
+  local pkg="$1"
+  if ! npm list -g "$pkg" &>/dev/null; then
+    echo "[dotfiles] Installing npm package $pkg..."
+    npm install -g "$pkg"
+  fi
+}
+
+# ------------------------------------------------------------
+# Homebrew
+# ------------------------------------------------------------
 if ! command -v brew >/dev/null 2>&1; then
   echo "[dotfiles] Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-else
-  echo "[dotfiles] Homebrew already installed, skipping install."
 fi
 
-# Apple Silicon-only brew setup (no Intel fallback)
+# Apple Silicon-only brew setup
 if [ -d /opt/homebrew ]; then
-  echo "[dotfiles] Configuring Homebrew shellenv for Apple Silicon..."
   eval "$(/opt/homebrew/bin/brew shellenv)"
 
-  # Ensure brew shellenv is loaded in future shells
   if ! grep -q 'brew shellenv' "${HOME}/.zprofile" 2>/dev/null; then
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "${HOME}/.zprofile"
     echo "[dotfiles] Added brew shellenv to ~/.zprofile"
   fi
 else
-  echo "[dotfiles] WARNING: /opt/homebrew not found. Are you sure this is an Apple Silicon Mac?" >&2
+  echo "[dotfiles] WARNING: /opt/homebrew not found. Apple Silicon Mac?" >&2
 fi
 
 # Make sure chezmoi itself is installed via Homebrew
 if ! brew list chezmoi >/dev/null 2>&1; then
   echo "[dotfiles] Installing chezmoi via Homebrew..."
   brew install chezmoi
-else
-  echo "[dotfiles] chezmoi already installed via Homebrew."
 fi
 
-echo "[dotfiles] Installing CLI tools and extras..."
+# ------------------------------------------------------------
+# CLI tools
+# ------------------------------------------------------------
+echo "[dotfiles] Checking CLI tools..."
 
-# Core CLI tools
-brew install jq yq fd bat eza zoxide direnv
+brew_install jq
+brew_install yq
+brew_install fd
+brew_install bat
+brew_install eza
+brew_install zoxide
+brew_install direnv
 
 # Zsh goodies
-brew install zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf
+brew_install zsh-syntax-highlighting
+brew_install zsh-autosuggestions
+brew_install zsh-completions
+brew_install fzf
 
-brew install --formula jandedobbeleer/oh-my-posh/oh-my-posh
+# oh-my-posh (tap formula)
+if ! brew list oh-my-posh &>/dev/null; then
+  brew install --formula jandedobbeleer/oh-my-posh/oh-my-posh
+fi
 
-# Tmux
-brew install tmux
+brew_install tmux
 
 # Dev tooling
-brew install go-task/tap/go-task uv autossh gh pyenv fnm 
-brew install lazygit
+if ! brew list go-task &>/dev/null; then
+  brew install go-task/tap/go-task
+fi
+brew_install uv
+brew_install autossh
+brew_install gh
+brew_install pyenv
+brew_install fnm
+brew_install lazygit
 
-# Fonts (need cask-fonts tap)
-brew tap homebrew/cask-fonts || true
-brew install --cask font-meslo-lg-nerd-font
+# ------------------------------------------------------------
+# Fonts & GUI apps
+# ------------------------------------------------------------
+echo "[dotfiles] Checking fonts and GUI apps..."
 
-# GUI apps
-brew install --cask wezterm
-brew install --cask docker
+brew_install_cask font-meslo-lg-nerd-font
+brew_install_cask wezterm
+brew_install_cask docker
 
-# Editor
-brew install neovim
-# Telescope plugin
-brew install ripgrep
-# Treesitter plugin
-brew install tree-sitter-cli
+# ------------------------------------------------------------
+# Editor & plugins
+# ------------------------------------------------------------
+echo "[dotfiles] Checking editor tools..."
 
-# -----------------------------------------------------------
-# Neovim LSP servers (macOS, Homebrew + Node)
-# -----------------------------------------------------------
+brew_install neovim
+brew_install ripgrep
+brew_install tree-sitter-cli
 
-# 1) Python LSP: Pyright
+# ------------------------------------------------------------
+# LSP servers
+# ------------------------------------------------------------
+echo "[dotfiles] Checking LSP servers..."
 
-brew install pyright
-brew install ruff black
+brew_install pyright
+brew_install ruff
+brew_install black
+brew_install lua-language-server
+brew_install node
+brew_install yaml-language-server
+brew_install vscode-langservers-extracted
+brew_install docker-language-server
+brew_install bash-language-server
 
-# 2) Lua LSP: lua-language-server
-#    Homebrew formula ships the binary
-brew install lua-language-server
+# TypeScript LSP (npm)
+npm_install_global typescript
+npm_install_global typescript-language-server
 
-# 3) TypeScript / JavaScript LSP: typescript-language-server
-brew install node
-npm install -g typescript typescript-language-server
+# ------------------------------------------------------------
+# Python via pyenv
+# ------------------------------------------------------------
+PYTHON_VERSION="3.14.2"
 
-# 4) Yaml, JSON, docker, zsh/sh
-brew install \
-  yaml-language-server \
-  vscode-langservers-extracted \
-  docker-language-server \
-  bash-language-server
+echo "[dotfiles] Checking Python $PYTHON_VERSION..."
 
-# ------------------------------------------------------------ 
-# Python/Debugger installation
-# ------------------------------------------------------------ 
-pyenv install 3.14.2
-pyenv global 3.14.2
-python -m pip install --upgrade pip
-python -m pip install debugpy
+if [ ! -d "${HOME}/.pyenv/versions/${PYTHON_VERSION}" ]; then
+  echo "[dotfiles] Installing Python $PYTHON_VERSION..."
+  pyenv install "$PYTHON_VERSION"
+fi
 
-# ------------------------------------------------------------ 
-# Claude Code 
-# ------------------------------------------------------------ 
+pyenv global "$PYTHON_VERSION"
+eval "$(pyenv init -)"
 
-curl -fsSL https://claude.ai/install.sh | bash
+# Ensure debugpy is installed
+if ! python -m pip show debugpy &>/dev/null; then
+  python -m pip install --upgrade pip
+  python -m pip install debugpy
+fi
+
+# ------------------------------------------------------------
+# Claude Code
+# ------------------------------------------------------------
+if ! command -v claude >/dev/null 2>&1; then
+  echo "[dotfiles] Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
 
 echo "[dotfiles] macOS bootstrap finished."
-
