@@ -226,12 +226,13 @@ echo "[dotfiles] Checking LSP servers..."
 # Python LSPs (via pip)
 python -m pip install --quiet pyright ruff black
 
-# TypeScript LSP (npm)
+# TypeScript LSP and tools (npm)
 npm_install_global typescript
 npm_install_global typescript-language-server
 npm_install_global bash-language-server
 npm_install_global yaml-language-server
 npm_install_global vscode-langservers-extracted
+# Note: tree-sitter-cli skipped - nvim-treesitter downloads prebuilt parsers
 
 # Lua LSP (binary)
 if ! command -v lua-language-server >/dev/null 2>&1; then
