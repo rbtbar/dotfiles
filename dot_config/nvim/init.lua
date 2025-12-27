@@ -576,6 +576,7 @@ require("lazy").setup({
     -- Claude Code integration (terminal managed externally via tmux)
     {
       "coder/claudecode.nvim",
+      lazy = false,  -- must load on startup to start the WebSocket server
       dependencies = { "folke/snacks.nvim" },
       opts = {
         terminal = {
