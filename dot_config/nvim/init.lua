@@ -166,6 +166,24 @@ opt.undofile = true       -- actually enable persistent undo
 -- Default is 4000ms; 250ms feels responsive without being too chatty.
 opt.updatetime = 250
 
+-----------------------------
+-- Auto-reload files
+-----------------------------
+-- Automatically reload files when changed externally (e.g., by Claude Code).
+opt.autoread = true
+
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  pattern = "*",
+  command = "checktime",
+})
+
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  pattern = "*",
+  callback = function()
+    vim.notify("File changed on disk. Buffer reloaded.", vim.log.levels.INFO)
+  end,
+})
+
 -- =======================================================================
 -- lazy.nvim plugin manager (single-file setup, per official docs)
 -- =======================================================================
