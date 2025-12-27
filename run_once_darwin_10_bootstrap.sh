@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Only run on macOS
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "[dotfiles] Not macOS, skipping."
+  exit 0
+fi
+
 echo "[dotfiles] macOS bootstrap starting..."
 
 # ------------------------------------------------------------
