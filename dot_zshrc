@@ -115,6 +115,10 @@ if command -v eza >/dev/null 2>&1; then
   alias ls="eza --icons=always"
 fi
 
+if command -v nvim >/dev/null 2>&1; then
+  alias vim="nvim"
+fi
+
 # ============================================================================
 # ZSH ENHANCEMENTS
 # ============================================================================
