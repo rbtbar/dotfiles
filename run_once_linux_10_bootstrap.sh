@@ -76,6 +76,7 @@ apt_install git
 apt_install unzip
 apt_install gnupg
 apt_install fontconfig
+apt_install build-essential  # needed for treesitter parser compilation
 
 # Zsh plugins
 apt_install zsh-syntax-highlighting
@@ -237,7 +238,16 @@ npm_install_global typescript-language-server
 npm_install_global bash-language-server
 npm_install_global yaml-language-server
 npm_install_global vscode-langservers-extracted
-# Note: tree-sitter-cli skipped - nvim-treesitter downloads prebuilt parsers
+
+# tree-sitter-cli requires glibc >= 2.39 (Ubuntu 24.04+)
+GLIBC_VERSION=$(ldd --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+$' || echo "0.0")
+GLIBC_MAJOR=$(echo "$GLIBC_VERSION" | cut -d. -f1)
+GLIBC_MINOR=$(echo "$GLIBC_VERSION" | cut -d. -f2)
+if [ "$GLIBC_MAJOR" -ge 2 ] && [ "$GLIBC_MINOR" -ge 39 ]; then
+  npm_install_global tree-sitter-cli
+else
+  echo "[dotfiles] Skipping tree-sitter-cli (requires glibc >= 2.39, found $GLIBC_VERSION)"
+fi
 
 # Lua LSP (binary)
 if ! command -v lua-language-server >/dev/null 2>&1; then
