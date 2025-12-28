@@ -104,12 +104,30 @@ export FZF_DEFAULT_OPTS="
 "
 
 # Use fd instead of find for file search (faster, respects .gitignore)
+{{ if eq .chezmoi.os "linux" -}}
+if command -v fdfind >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fdfind --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+{{ else -}}
 if command -v fd >/dev/null 2>&1; then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
+{{ end -}}
 
 # Enhanced history search with bat preview (if bat present)
+{{ if eq .chezmoi.os "linux" -}}
+if command -v batcat >/dev/null 2>&1; then
+  export FZF_CTRL_R_OPTS="
+    --preview 'echo {} | batcat --style=numbers,plain --language=sh --color=always'
+    --preview-window=up:5:wrap
+    --bind 'ctrl-/:toggle-preview'
+    --color header:italic
+    --tiebreak=begin,index --no-sort --exact --algo=v2
+  "
+fi
+{{ else -}}
 if command -v bat >/dev/null 2>&1; then
   export FZF_CTRL_R_OPTS="
     --preview 'echo {} | bat --style=numbers,plain --language=sh --color=always'
@@ -119,12 +137,25 @@ if command -v bat >/dev/null 2>&1; then
     --tiebreak=begin,index --no-sort --exact --algo=v2
   "
 fi
+{{ end -}}
 
 # ============================================================================
 # ALIASES - Modern CLI Tool Replacements
 # ============================================================================
 alias ssh="ssh -F $HOME/.ssh/config"
 
+{{ if eq .chezmoi.os "linux" -}}
+# Debian/Ubuntu use different binary names to avoid conflicts
+if command -v batcat >/dev/null 2>&1; then
+  alias bat="batcat"
+  alias cat="batcat"
+fi
+
+if command -v fdfind >/dev/null 2>&1; then
+  alias fd="fdfind"
+  alias find="fdfind"
+fi
+{{ else -}}
 if command -v bat >/dev/null 2>&1; then
   alias cat="bat"
 fi
@@ -132,6 +163,7 @@ fi
 if command -v fd >/dev/null 2>&1; then
   alias find="fd"
 fi
+{{ end -}}
 
 if command -v eza >/dev/null 2>&1; then
   alias ls="eza --icons=always"

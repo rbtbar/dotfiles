@@ -95,7 +95,15 @@ fi
 # yq (YAML processor)
 if ! command -v yq >/dev/null 2>&1; then
   echo "[dotfiles] Installing yq..."
-  $SUDO wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    YQ_ARCH="amd64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    YQ_ARCH="arm64"
+  else
+    YQ_ARCH="amd64"
+  fi
+  $SUDO wget -qO /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${YQ_ARCH}"
   $SUDO chmod +x /usr/local/bin/yq
 fi
 
@@ -134,7 +142,15 @@ fi
 if ! command -v lazygit >/dev/null 2>&1; then
   echo "[dotfiles] Installing lazygit..."
   LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    LAZYGIT_ARCH="x86_64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    LAZYGIT_ARCH="arm64"
+  else
+    LAZYGIT_ARCH="x86_64"
+  fi
+  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz"
   tar xf lazygit.tar.gz lazygit
   $SUDO install lazygit /usr/local/bin
   rm lazygit lazygit.tar.gz
@@ -259,11 +275,22 @@ fi
 if ! command -v lua-language-server >/dev/null 2>&1; then
   echo "[dotfiles] Installing lua-language-server..."
   LUA_LS_VERSION=$(curl -s "https://api.github.com/repos/LuaLS/lua-language-server/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
-  curl -Lo lua-language-server.tar.gz "https://github.com/LuaLS/lua-language-server/releases/download/${LUA_LS_VERSION}/lua-language-server-${LUA_LS_VERSION}-linux-x64.tar.gz"
-  $SUDO mkdir -p /opt/lua-language-server
-  $SUDO tar xf lua-language-server.tar.gz -C /opt/lua-language-server
-  $SUDO ln -sf /opt/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-  rm lua-language-server.tar.gz
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    LUA_LS_ARCH="linux-x64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    LUA_LS_ARCH="linux-arm64"
+  else
+    echo "[dotfiles] WARNING: Unsupported architecture $ARCH for lua-language-server"
+    LUA_LS_ARCH=""
+  fi
+  if [ -n "$LUA_LS_ARCH" ]; then
+    curl -Lo lua-language-server.tar.gz "https://github.com/LuaLS/lua-language-server/releases/download/${LUA_LS_VERSION}/lua-language-server-${LUA_LS_VERSION}-${LUA_LS_ARCH}.tar.gz"
+    $SUDO mkdir -p /opt/lua-language-server
+    $SUDO tar xf lua-language-server.tar.gz -C /opt/lua-language-server
+    $SUDO ln -sf /opt/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
+    rm lua-language-server.tar.gz
+  fi
 fi
 
 # ------------------------------------------------------------
