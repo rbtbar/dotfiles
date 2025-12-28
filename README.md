@@ -85,6 +85,6 @@ docker run -it --rm -v "$(pwd):/dotfiles" -w /dotfiles ubuntu:24.04 bash
 Inside the container:
 
 ```bash
-apt-get update && apt-get install -y curl git
+apt-get update && apt-get install -y curl wget git
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply --source .
 ```
