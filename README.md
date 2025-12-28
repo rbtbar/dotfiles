@@ -49,12 +49,22 @@ ssh -T git@github.com
 
 ## Installation
 
-One-line install:
+### With SSH key (recommended for regular machines)
 
 ```bash
 export GITHUB_USERNAME=rbtbar
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply git@github.com:$GITHUB_USERNAME/dotfiles.git
 ```
+
+### With GitHub token (for one-time/ephemeral setups)
+
+```bash
+export GITHUB_USERNAME=rbtbar
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply "https://${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/dotfiles.git"
+```
+
+Generate a token at https://github.com/settings/tokens (only `repo` scope needed for private repos, or no scope for public).
 
 ## Reset
 
