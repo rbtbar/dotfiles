@@ -4,7 +4,7 @@
 
 {{ if eq .chezmoi.os "linux" -}}
 # Add common Linux install locations to PATH
-export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+export PATH="$HOME/.fzf/bin:$HOME/.local/bin:$HOME/bin:$PATH"
 # Set locale for proper Unicode/icon support
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -82,11 +82,14 @@ if command -v brew >/dev/null 2>&1; then
   fi
 fi
 {{ else if eq .chezmoi.os "linux" -}}
+# fzf keybindings - try multiple locations
 if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
   source /usr/share/doc/fzf/examples/key-bindings.zsh
-fi
-if [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
-  source /usr/share/doc/fzf/examples/completion.zsh
+elif [[ -f ~/.fzf/shell/key-bindings.zsh ]]; then
+  source ~/.fzf/shell/key-bindings.zsh
+elif command -v fzf >/dev/null 2>&1; then
+  # Fallback: try fzf --zsh (newer versions)
+  eval "$(fzf --zsh 2>/dev/null)" || true
 fi
 {{ end -}}
 

@@ -66,7 +66,6 @@ echo "[dotfiles] Checking CLI tools..."
 apt_install jq
 apt_install fd-find
 apt_install bat
-apt_install fzf
 apt_install tmux
 apt_install ripgrep
 apt_install direnv
@@ -85,6 +84,13 @@ apt_install zsh-autosuggestions
 # ------------------------------------------------------------
 # Tools not in apt - install via binary/script
 # ------------------------------------------------------------
+
+# fzf (from git for shell keybindings)
+if [ ! -d "$HOME/.fzf" ]; then
+  echo "[dotfiles] Installing fzf..."
+  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+  "$HOME/.fzf/install" --key-bindings --completion --no-update-rc --no-bash --no-fish
+fi
 
 # yq (YAML processor)
 if ! command -v yq >/dev/null 2>&1; then
