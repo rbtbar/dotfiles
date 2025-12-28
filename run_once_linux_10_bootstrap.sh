@@ -47,6 +47,11 @@ $SUDO apt-get update
 # Install zsh and set as default shell
 # ------------------------------------------------------------
 apt_install zsh
+apt_install locales
+
+# Generate UTF-8 locale
+$SUDO sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+$SUDO locale-gen
 
 if [ "$SHELL" != "$(which zsh)" ]; then
   echo "[dotfiles] Setting zsh as default shell..."
