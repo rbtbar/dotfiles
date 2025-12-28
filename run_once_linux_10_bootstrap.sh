@@ -55,7 +55,7 @@ $SUDO locale-gen
 
 if [ "$SHELL" != "$(which zsh)" ]; then
   echo "[dotfiles] Setting zsh as default shell..."
-  if chsh -s "$(which zsh)" 2>/dev/null; then
+  if timeout 5 chsh -s "$(which zsh)" 2>/dev/null; then
     echo "[dotfiles] Default shell changed to zsh"
   else
     echo "[dotfiles] WARNING: Could not change default shell (OS Login or similar)."
