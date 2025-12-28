@@ -95,7 +95,7 @@ elif [ "$OS" = "Linux" ]; then
     . /etc/os-release
     check_info "Distribution: $NAME $VERSION"
   fi
-  GLIBC_VERSION=$(ldd --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+$' || echo "unknown")
+  GLIBC_VERSION=$(ldd --version 2>&1 | awk 'NR==1 {print $NF}')
   check_info "glibc: $GLIBC_VERSION"
 fi
 
