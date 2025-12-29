@@ -573,6 +573,13 @@ require("lazy").setup({
         },
       },
     },
+    -- Snacks.nvim (required by claudecode.nvim)
+    {
+      "folke/snacks.nvim",
+      lazy = false,
+      priority = 1000,
+      opts = {},
+    },
     -- Claude Code integration (terminal managed externally via tmux)
     {
       "coder/claudecode.nvim",

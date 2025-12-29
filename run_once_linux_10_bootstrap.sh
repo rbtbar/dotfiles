@@ -82,6 +82,9 @@ apt_install unzip
 apt_install gnupg
 apt_install fontconfig
 apt_install build-essential  # needed for treesitter parser compilation
+apt_install ninja-build      # needed for neovim source build
+apt_install gettext          # needed for neovim source build
+apt_install cmake            # needed for neovim source build
 
 # Zsh plugins
 apt_install zsh-syntax-highlighting
@@ -163,21 +166,42 @@ if ! command -v lazygit >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------
-# Neovim (from GitHub releases)
+# Neovim (build from source on older glibc, binary on newer)
 # ------------------------------------------------------------
 if ! command -v nvim >/dev/null 2>&1; then
   echo "[dotfiles] Installing Neovim..."
-  NVIM_VERSION=$(curl -s "https://api.github.com/repos/neovim/neovim/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
-  ARCH=$(uname -m)
-  if [ "$ARCH" = "x86_64" ]; then
-    curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-x86_64.tar.gz"
-  elif [ "$ARCH" = "aarch64" ]; then
-    curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-arm64.tar.gz"
+
+  # Check glibc version - nvim binary requires >= 2.32
+  GLIBC_VER=$(ldd --version 2>&1 | awk 'NR==1 {print $NF}')
+  GLIBC_MINOR=$(echo "$GLIBC_VER" | cut -d. -f2)
+
+  if [ "$GLIBC_MINOR" -lt 32 ]; then
+    # Build from source for older glibc (Debian 11, etc.)
+    echo "[dotfiles] Building Neovim from source (glibc $GLIBC_VER < 2.32, ~5-10 min)..."
+    NVIM_VERSION="v0.11.5"
+    ORIG_DIR="$(pwd)"
+    cd /tmp
+    rm -rf neovim
+    git clone --depth 1 --branch "$NVIM_VERSION" https://github.com/neovim/neovim.git
+    cd neovim
+    make CMAKE_BUILD_TYPE=Release
+    $SUDO make install
+    cd "$ORIG_DIR"
+    rm -rf /tmp/neovim
+  else
+    # Use regular binary for newer glibc
+    NVIM_VERSION=$(curl -s "https://api.github.com/repos/neovim/neovim/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "x86_64" ]; then
+      curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-x86_64.tar.gz"
+    elif [ "$ARCH" = "aarch64" ]; then
+      curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-arm64.tar.gz"
+    fi
+    tar xzf nvim.tar.gz
+    $SUDO mv nvim-linux-*/  /opt/nvim
+    $SUDO ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+    rm -rf nvim.tar.gz nvim-linux-*
   fi
-  tar xzf nvim.tar.gz
-  $SUDO mv nvim-linux-*/  /opt/nvim
-  $SUDO ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
-  rm -rf nvim.tar.gz nvim-linux-*
 fi
 
 # ------------------------------------------------------------
