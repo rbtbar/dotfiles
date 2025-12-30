@@ -21,10 +21,10 @@ fi
 NVIM_VERSION="v0.11.5"
 
 # ------------------------------------------------------------
-# Terminal utilities (for AstroNvim toggles)
+# Terminal utilities (for nvim toggles)
 # ------------------------------------------------------------
 
-# gdu (disk usage - for AstroNvim <Leader>tu)
+# gdu (disk usage - for nvim <Leader>tu)
 if ! command -v gdu >/dev/null 2>&1; then
   echo "[dotfiles] Installing gdu..."
   ARCH=$(uname -m)
@@ -41,7 +41,7 @@ if ! command -v gdu >/dev/null 2>&1; then
   rm gdu.tgz "gdu_linux_${GDU_ARCH}"
 fi
 
-# bottom (process viewer - for AstroNvim <Leader>tt)
+# bottom (process viewer - for nvim <Leader>tt)
 if ! command -v btm >/dev/null 2>&1; then
   echo "[dotfiles] Installing bottom..."
   ARCH=$(uname -m)
@@ -87,19 +87,5 @@ if ! nvim --version >/dev/null 2>&1; then
 fi
 
 echo "[dotfiles] Neovim: $(nvim --version | head -n 1)"
-
-# ------------------------------------------------------------
-# AstroNvim (side-by-side via NVIM_APPNAME=astronvim)
-# ------------------------------------------------------------
-ASTRO_DIR="$HOME/.config/astronvim"
-if [ ! -d "$ASTRO_DIR/lua/plugins" ]; then
-  echo "[dotfiles] Installing AstroNvim template..."
-  rm -rf "$ASTRO_DIR"
-  git clone https://github.com/AstroNvim/template "$ASTRO_DIR"
-  rm -rf "$ASTRO_DIR/.git"
-fi
-
-echo "[dotfiles] Bootstrapping AstroNvim..."
-NVIM_APPNAME=astronvim nvim --headless "+qall" || true
 
 echo "[dotfiles] Editor setup finished."

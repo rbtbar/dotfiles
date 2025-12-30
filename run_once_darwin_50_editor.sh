@@ -23,7 +23,7 @@ brew_install() {
 }
 
 # ------------------------------------------------------------
-# Terminal utilities (for AstroNvim toggles)
+# Terminal utilities (for nvim toggles)
 # ------------------------------------------------------------
 brew_install gdu      # disk usage (<Leader>tu)
 brew_install bottom   # process viewer (<Leader>tt)
@@ -43,19 +43,5 @@ bob install "$NVIM_VERSION"
 bob use "$NVIM_VERSION"
 
 echo "[dotfiles] Neovim: $(nvim --version | head -n 1)"
-
-# ------------------------------------------------------------
-# AstroNvim (side-by-side via NVIM_APPNAME=astronvim)
-# ------------------------------------------------------------
-ASTRO_DIR="$HOME/.config/astronvim"
-if [ ! -d "$ASTRO_DIR/lua/plugins" ]; then
-  echo "[dotfiles] Installing AstroNvim template..."
-  rm -rf "$ASTRO_DIR"
-  git clone https://github.com/AstroNvim/template "$ASTRO_DIR"
-  rm -rf "$ASTRO_DIR/.git"
-fi
-
-echo "[dotfiles] Bootstrapping AstroNvim..."
-NVIM_APPNAME=astronvim nvim --headless "+qall" || true
 
 echo "[dotfiles] Editor setup finished."
