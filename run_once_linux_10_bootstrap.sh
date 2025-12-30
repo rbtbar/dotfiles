@@ -279,8 +279,8 @@ pyenv global "$PYTHON_VERSION"
 
 # Ensure debugpy is installed
 if ! python -m pip show debugpy &>/dev/null; then
-  python -m pip install --upgrade pip
-  python -m pip install debugpy
+  python -m pip install --root-user-action=ignore --upgrade pip
+  python -m pip install --root-user-action=ignore debugpy
 fi
 
 # ------------------------------------------------------------
@@ -289,7 +289,7 @@ fi
 echo "[dotfiles] Checking LSP servers..."
 
 # Python LSPs (via pip)
-python -m pip install --quiet pyright ruff black
+python -m pip install --root-user-action=ignore --quiet pyright ruff black
 
 # TypeScript LSP and tools (npm)
 npm_install_global typescript

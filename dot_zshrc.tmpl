@@ -2,9 +2,12 @@
 # ~/.zshrc - Zsh Configuration
 # ============================================================================
 
+# bob nvim version manager (must come before other nvim paths)
+export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/bin:$PATH"
+
 {{ if eq .chezmoi.os "linux" -}}
 # Add common Linux install locations to PATH
-export PATH="$HOME/.fzf/bin:$HOME/.local/bin:$HOME/bin:$PATH"
+export PATH="$HOME/.fzf/bin:$HOME/bin:$PATH"
 # Set locale for proper Unicode/icon support
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
