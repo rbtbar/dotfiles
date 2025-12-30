@@ -10,6 +10,22 @@ fi
 echo "[dotfiles] macOS bootstrap starting..."
 
 # ------------------------------------------------------------
+# Optional env overrides (NVIM_VERSION must come from env)
+# ------------------------------------------------------------
+if [ -f "$HOME/.config/dotfiles/env" ]; then
+  # shellcheck source=/dev/null
+  . "$HOME/.config/dotfiles/env"
+fi
+
+if [ -z "${NVIM_VERSION:-}" ]; then
+  echo "[dotfiles] ERROR: NVIM_VERSION is not set."
+  echo "[dotfiles] Set it via: export NVIM_VERSION='v0.11.5' (or create ~/.config/dotfiles/env)"
+  exit 1
+fi
+
+export NVIM_VERSION
+
+# ------------------------------------------------------------
 # Helper: install brew formula/cask only if not already installed
 # ------------------------------------------------------------
 brew_install() {
@@ -113,7 +129,22 @@ brew_install_cask docker
 # ------------------------------------------------------------
 echo "[dotfiles] Checking editor tools..."
 
-brew_install neovim
+# ------------------------------------------------------------
+# Neovim via bob (version-managed)
+# ------------------------------------------------------------
+if ! command -v bob >/dev/null 2>&1; then
+  echo "[dotfiles] Installing bob..."
+  curl -fsSL https://raw.githubusercontent.com/MordechaiHadad/bob/master/scripts/install.sh | bash
+fi
+
+export PATH="$HOME/.local/bin:$HOME/.local/share/bob/nvim-bin:$PATH"
+
+echo "[dotfiles] Installing Neovim $NVIM_VERSION via bob..."
+bob install "$NVIM_VERSION"
+bob use "$NVIM_VERSION"
+
+echo "[dotfiles] Neovim: $(nvim --version | head -n 1)"
+
 brew_install ripgrep
 brew_install tree-sitter-cli
 
@@ -164,5 +195,18 @@ if ! command -v claude >/dev/null 2>&1; then
   echo "[dotfiles] Installing Claude Code..."
   curl -fsSL https://claude.ai/install.sh | bash
 fi
+
+# ------------------------------------------------------------
+# AstroNvim (side-by-side via NVIM_APPNAME=astronvim)
+# ------------------------------------------------------------
+ASTRO_DIR="$HOME/.config/astronvim"
+if [ ! -d "$ASTRO_DIR" ]; then
+  echo "[dotfiles] Installing AstroNvim template..."
+  git clone https://github.com/AstroNvim/template "$ASTRO_DIR"
+  rm -rf "$ASTRO_DIR/.git"
+fi
+
+echo "[dotfiles] Bootstrapping AstroNvim..."
+NVIM_APPNAME=astronvim nvim --headless "+qall" || true
 
 echo "[dotfiles] macOS bootstrap finished."

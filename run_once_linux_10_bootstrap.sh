@@ -19,6 +19,22 @@ else
 fi
 
 # ------------------------------------------------------------
+# Optional env overrides (NVIM_VERSION must come from env)
+# ------------------------------------------------------------
+if [ -f "$HOME/.config/dotfiles/env" ]; then
+  # shellcheck source=/dev/null
+  . "$HOME/.config/dotfiles/env"
+fi
+
+if [ -z "${NVIM_VERSION:-}" ]; then
+  echo "[dotfiles] ERROR: NVIM_VERSION is not set."
+  echo "[dotfiles] Set it via: export NVIM_VERSION='v0.11.5' (or create ~/.config/dotfiles/env)"
+  exit 1
+fi
+
+export NVIM_VERSION
+
+# ------------------------------------------------------------
 # Helper functions
 # ------------------------------------------------------------
 apt_install() {
@@ -166,43 +182,34 @@ if ! command -v lazygit >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------
-# Neovim (build from source on older glibc, binary on newer)
+# Neovim via bob (version-managed)
 # ------------------------------------------------------------
-if ! command -v nvim >/dev/null 2>&1; then
-  echo "[dotfiles] Installing Neovim..."
-
-  # Check glibc version - nvim binary requires >= 2.32
-  GLIBC_VER=$(ldd --version 2>&1 | awk 'NR==1 {print $NF}')
-  GLIBC_MINOR=$(echo "$GLIBC_VER" | cut -d. -f2)
-
-  if [ "$GLIBC_MINOR" -lt 32 ]; then
-    # Build from source for older glibc (Debian 11, etc.)
-    echo "[dotfiles] Building Neovim from source (glibc $GLIBC_VER < 2.32, ~5-10 min)..."
-    NVIM_VERSION="v0.11.5"
-    ORIG_DIR="$(pwd)"
-    cd /tmp
-    rm -rf neovim
-    git clone --depth 1 --branch "$NVIM_VERSION" https://github.com/neovim/neovim.git
-    cd neovim
-    make CMAKE_BUILD_TYPE=Release
-    $SUDO make install
-    cd "$ORIG_DIR"
-    rm -rf /tmp/neovim
-  else
-    # Use regular binary for newer glibc
-    NVIM_VERSION=$(curl -s "https://api.github.com/repos/neovim/neovim/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
-    ARCH=$(uname -m)
-    if [ "$ARCH" = "x86_64" ]; then
-      curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-x86_64.tar.gz"
-    elif [ "$ARCH" = "aarch64" ]; then
-      curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-arm64.tar.gz"
-    fi
-    tar xzf nvim.tar.gz
-    $SUDO mv nvim-linux-*/  /opt/nvim
-    $SUDO ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
-    rm -rf nvim.tar.gz nvim-linux-*
-  fi
+if ! command -v bob >/dev/null 2>&1; then
+  echo "[dotfiles] Installing bob..."
+  curl -fsSL https://raw.githubusercontent.com/MordechaiHadad/bob/master/scripts/install.sh | bash
 fi
+
+export PATH="$HOME/.local/bin:$HOME/.local/share/bob/nvim-bin:$PATH"
+
+echo "[dotfiles] Installing Neovim $NVIM_VERSION via bob..."
+bob install "$NVIM_VERSION"
+bob use "$NVIM_VERSION"
+
+# Fallback: if bob's nvim binary doesn't work (old glibc), build from source
+if ! nvim --version >/dev/null 2>&1; then
+  echo "[dotfiles] WARNING: nvim from bob failed to run; falling back to source build for $NVIM_VERSION"
+  ORIG_DIR="$(pwd)"
+  cd /tmp
+  rm -rf neovim
+  git clone --depth 1 --branch "$NVIM_VERSION" https://github.com/neovim/neovim.git
+  cd neovim
+  make CMAKE_BUILD_TYPE=Release
+  $SUDO make install
+  cd "$ORIG_DIR"
+  rm -rf /tmp/neovim
+fi
+
+echo "[dotfiles] Neovim: $(nvim --version | head -n 1)"
 
 # ------------------------------------------------------------
 # Nerd Font (for icons in terminal/nvim)
@@ -330,6 +337,19 @@ if ! command -v claude >/dev/null 2>&1; then
   echo "[dotfiles] Installing Claude Code..."
   curl -fsSL https://claude.ai/install.sh | bash
 fi
+
+# ------------------------------------------------------------
+# AstroNvim (side-by-side via NVIM_APPNAME=astronvim)
+# ------------------------------------------------------------
+ASTRO_DIR="$HOME/.config/astronvim"
+if [ ! -d "$ASTRO_DIR" ]; then
+  echo "[dotfiles] Installing AstroNvim template..."
+  git clone https://github.com/AstroNvim/template "$ASTRO_DIR"
+  rm -rf "$ASTRO_DIR/.git"
+fi
+
+echo "[dotfiles] Bootstrapping AstroNvim..."
+NVIM_APPNAME=astronvim nvim --headless "+qall" || true
 
 echo "[dotfiles] Linux bootstrap finished."
 echo "[dotfiles] Please log out and back in for shell change to take effect."
