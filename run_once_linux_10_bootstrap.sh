@@ -342,11 +342,23 @@ fi
 # AstroNvim (side-by-side via NVIM_APPNAME=astronvim)
 # ------------------------------------------------------------
 ASTRO_DIR="$HOME/.config/astronvim"
-if [ ! -d "$ASTRO_DIR" ]; then
+if [ ! -d "$ASTRO_DIR/lua/plugins" ]; then
   echo "[dotfiles] Installing AstroNvim template..."
+  rm -rf "$ASTRO_DIR"
   git clone https://github.com/AstroNvim/template "$ASTRO_DIR"
   rm -rf "$ASTRO_DIR/.git"
 fi
+
+# Disable mason auto-install (we manage tools via bootstrap)
+cat > "$ASTRO_DIR/lua/plugins/mason-tool-installer.lua" << 'EOF'
+return {
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  opts = {
+    run_on_start = false,
+    auto_update = false,
+  },
+}
+EOF
 
 echo "[dotfiles] Bootstrapping AstroNvim..."
 NVIM_APPNAME=astronvim nvim --headless "+qall" || true
