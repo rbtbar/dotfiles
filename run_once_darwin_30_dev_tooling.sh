@@ -41,8 +41,6 @@ brew_install gh
 brew_install pyenv
 brew_install fnm
 brew_install lazygit
-brew_install ruff
-brew_install black
 
 brew_install_cask docker
 
@@ -61,12 +59,6 @@ if [ ! -d "${HOME}/.pyenv/versions/${PYTHON_VERSION}" ]; then
 fi
 
 pyenv global "$PYTHON_VERSION"
-
-# Ensure debugpy is installed
-if ! python -m pip show debugpy &>/dev/null; then
-  python -m pip install --upgrade pip
-  python -m pip install debugpy
-fi
 
 # ------------------------------------------------------------
 # Node.js via fnm

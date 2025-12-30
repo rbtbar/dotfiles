@@ -9,21 +9,7 @@ fi
 
 echo "[dotfiles] macOS editor setup starting..."
 
-# ------------------------------------------------------------
-# Optional env overrides (NVIM_VERSION must come from env)
-# ------------------------------------------------------------
-if [ -f "$HOME/.config/dotfiles/env" ]; then
-  # shellcheck source=/dev/null
-  . "$HOME/.config/dotfiles/env"
-fi
-
-if [ -z "${NVIM_VERSION:-}" ]; then
-  echo "[dotfiles] ERROR: NVIM_VERSION is not set."
-  echo "[dotfiles] Set it via: export NVIM_VERSION='v0.11.0' (or create ~/.config/dotfiles/env)"
-  exit 1
-fi
-
-export NVIM_VERSION
+NVIM_VERSION="v0.11.5"
 
 # ------------------------------------------------------------
 # Helper: install brew formula only if not already installed

@@ -94,13 +94,4 @@ fi
 
 pyenv global "$PYTHON_VERSION"
 
-# Ensure debugpy is installed
-if ! python -m pip show debugpy &>/dev/null; then
-  python -m pip install --root-user-action=ignore --upgrade pip
-  python -m pip install --root-user-action=ignore debugpy
-fi
-
-# Python tools via pip
-python -m pip install --root-user-action=ignore --quiet ruff black
-
 echo "[dotfiles] Dev tooling setup finished."
