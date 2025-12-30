@@ -244,12 +244,6 @@ if command -v python >/dev/null 2>&1; then
   PY_VERSION=$(python --version 2>&1)
   check_pass "python: $PY_VERSION"
 
-  # Check debugpy
-  if python -m pip show debugpy &>/dev/null; then
-    check_pass "debugpy installed"
-  else
-    check_warn "debugpy not installed"
-  fi
 else
   check_fail "python not found in PATH"
 fi
@@ -312,56 +306,6 @@ if [ -d "$HOME/.config/nvim" ]; then
   check_pass "Neovim config directory exists"
 else
   check_warn "Neovim config not found at ~/.config/nvim"
-fi
-
-# tree-sitter CLI (optional on older glibc)
-if command -v tree-sitter >/dev/null 2>&1; then
-  if tree-sitter --version >/dev/null 2>&1; then
-    TS_VERSION=$(tree-sitter --version 2>&1 | head -1)
-    check_pass "tree-sitter: $TS_VERSION"
-  else
-    check_fail "tree-sitter: installed but test failed"
-  fi
-else
-  if [ "$OS" = "Linux" ]; then
-    check_info "tree-sitter-cli not installed (requires glibc >= 2.39)"
-  else
-    check_warn "tree-sitter-cli not installed"
-  fi
-fi
-
-# ------------------------------------------------------------
-# LSP Servers (with functional tests)
-# ------------------------------------------------------------
-section "LSP Servers"
-
-# pyright - version check
-check_tool pyright "pyright --version" "pyright"
-
-# ruff - check test
-check_tool ruff "echo 'x=1' | ruff check --stdin-filename=test.py" "ruff"
-
-# lua-language-server - version
-check_tool lua-language-server "lua-language-server --version" "lua-language-server"
-
-# typescript-language-server - version
-check_tool typescript-language-server "typescript-language-server --version" "TypeScript LSP"
-
-# bash-language-server - version
-check_tool bash-language-server "bash-language-server --version" "Bash LSP"
-
-# yaml-language-server - stdio server, just check it exists
-if command -v yaml-language-server >/dev/null 2>&1; then
-  check_pass "YAML LSP: $(command -v yaml-language-server)"
-else
-  check_fail "YAML LSP: not found"
-fi
-
-# vscode-langservers-extracted - stdio servers, just check they exist
-if command -v vscode-json-language-server >/dev/null 2>&1; then
-  check_pass "vscode-langservers-extracted (JSON/HTML/CSS)"
-else
-  check_warn "vscode-langservers-extracted not found"
 fi
 
 # ------------------------------------------------------------
