@@ -104,6 +104,10 @@ fi
 
 brew_install tmux
 
+# Terminal utilities (for AstroNvim toggles)
+brew_install gdu      # disk usage (<Leader>tu)
+brew_install bottom   # process viewer (<Leader>tt)
+
 # Dev tooling
 if ! brew list go-task &>/dev/null; then
   brew install go-task/tap/go-task

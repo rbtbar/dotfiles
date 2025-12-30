@@ -147,6 +147,10 @@ fi
 # ============================================================================
 alias ssh="ssh -F $HOME/.ssh/config"
 
+# AstroNvim as default editor
+alias av="NVIM_APPNAME=astronvim nvim"
+alias vim="NVIM_APPNAME=astronvim nvim"
+
 {{ if eq .chezmoi.os "linux" -}}
 # Debian/Ubuntu use different binary names to avoid conflicts
 if command -v batcat >/dev/null 2>&1; then

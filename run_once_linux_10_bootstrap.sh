@@ -181,6 +181,40 @@ if ! command -v lazygit >/dev/null 2>&1; then
   rm lazygit lazygit.tar.gz
 fi
 
+# gdu (disk usage - for AstroNvim <Leader>tu)
+if ! command -v gdu >/dev/null 2>&1; then
+  echo "[dotfiles] Installing gdu..."
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    GDU_ARCH="amd64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    GDU_ARCH="arm64"
+  else
+    GDU_ARCH="amd64"
+  fi
+  curl -Lo gdu.tgz "https://github.com/dundee/gdu/releases/latest/download/gdu_linux_${GDU_ARCH}.tgz"
+  tar xf gdu.tgz
+  $SUDO install "gdu_linux_${GDU_ARCH}" /usr/local/bin/gdu
+  rm gdu.tgz "gdu_linux_${GDU_ARCH}"
+fi
+
+# bottom (process viewer - for AstroNvim <Leader>tt)
+if ! command -v btm >/dev/null 2>&1; then
+  echo "[dotfiles] Installing bottom..."
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    BTM_ARCH="x86_64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    BTM_ARCH="aarch64"
+  else
+    BTM_ARCH="x86_64"
+  fi
+  curl -Lo bottom.tar.gz "https://github.com/ClementTsang/bottom/releases/latest/download/bottom_${BTM_ARCH}-unknown-linux-gnu.tar.gz"
+  tar xf bottom.tar.gz btm
+  $SUDO install btm /usr/local/bin
+  rm bottom.tar.gz btm
+fi
+
 # ------------------------------------------------------------
 # Neovim via bob (version-managed)
 # ------------------------------------------------------------
