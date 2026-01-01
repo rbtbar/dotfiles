@@ -4,6 +4,19 @@ Personal dotfiles managed with [chezmoi](https://chezmoi.io/).
 
 **Supported platforms:** macOS, Linux (apt-get)
 
+## Installation
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply "https://github.com/rbtbar/dotfiles.git"
+```
+
+## Update
+
+```bash
+chezmoi git pull && chezmoi apply
+```
+
+
 ## Reset
 
 Remove chezmoi completely:
