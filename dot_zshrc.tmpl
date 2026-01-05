@@ -283,11 +283,11 @@ gwa() {
   fi
 }
 
-gwtr() {
+gwr() {
   local feature="$1"
 
   if [[ -z "$feature" ]]; then
-    echo "Usage: gwtr <feature-name>"
+    echo "Usage: gwr <feature-name>"
     return 1
   fi
 
@@ -309,19 +309,19 @@ gwtr() {
   git worktree remove "$wt_path"
 }
 
-gwtl() {
+gwl() {
   git worktree list
 }
 
-gwtp() {
+gwp() {
   git worktree prune
 }
 
-gwtc() {
+gwcd() {
   local feature="$1"
 
   if [[ -z "$feature" ]]; then
-    echo "Usage: gwtc <feature-name>"
+    echo "Usage: gwcd <feature-name>"
     return 1
   fi
 
