@@ -47,6 +47,24 @@ if ! command -v lazygit >/dev/null 2>&1; then
   rm lazygit lazygit.tar.gz
 fi
 
+# lazydocker
+if ! command -v lazydocker >/dev/null 2>&1; then
+  echo "[dotfiles] Installing lazydocker..."
+  LAZYDOCKER_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazydocker/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    LAZYDOCKER_ARCH="x86_64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    LAZYDOCKER_ARCH="arm64"
+  else
+    LAZYDOCKER_ARCH="x86_64"
+  fi
+  curl -Lo lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_${LAZYDOCKER_VERSION}_Linux_${LAZYDOCKER_ARCH}.tar.gz"
+  tar xf lazydocker.tar.gz lazydocker
+  $SUDO install lazydocker /usr/local/bin
+  rm lazydocker lazydocker.tar.gz
+fi
+
 # ------------------------------------------------------------
 # Node.js via fnm
 # ------------------------------------------------------------
