@@ -247,6 +247,103 @@ rmt() {
 }
 
 # ============================================================================
+# GIT
+# ============================================================================
+
+gwt() {
+  local feature="$1"
+
+  if [[ -z "$feature" ]]; then
+    echo "Usage: gwt <feature-name>"
+    return 1
+  fi
+
+  # Get git root directory
+  local git_root
+  git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [[ -z "$git_root" ]]; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  # Get repo name and parent directory
+  local repo_name=$(basename "$git_root")
+  local parent_dir=$(dirname "$git_root")
+
+  # Build worktree path next to repo (not nested)
+  local wt_path="$parent_dir/${repo_name}-wt-${feature}"
+
+  # Check if branch exists
+  if git show-ref --verify --quiet "refs/heads/$feature"; then
+    # Branch exists, use existing branch
+    git worktree add "$wt_path" "$feature"
+  else
+    # Branch doesn't exist, create new branch
+    git worktree add -b "$feature" "$wt_path"
+  fi
+}
+
+gwtr() {
+  local feature="$1"
+
+  if [[ -z "$feature" ]]; then
+    echo "Usage: gwtr <feature-name>"
+    return 1
+  fi
+
+  # Get git root directory
+  local git_root
+  git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [[ -z "$git_root" ]]; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  # Get repo name and parent directory
+  local repo_name=$(basename "$git_root")
+  local parent_dir=$(dirname "$git_root")
+
+  # Build worktree path
+  local wt_path="$parent_dir/${repo_name}-wt-${feature}"
+
+  git worktree remove "$wt_path"
+}
+
+gwtl() {
+  git worktree list
+}
+
+gwtp() {
+  git worktree prune
+}
+
+gwtc() {
+  local feature="$1"
+
+  if [[ -z "$feature" ]]; then
+    echo "Usage: gwtc <feature-name>"
+    return 1
+  fi
+
+  # Get git root directory
+  local git_root
+  git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [[ -z "$git_root" ]]; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  # Get repo name and parent directory
+  local repo_name=$(basename "$git_root")
+  local parent_dir=$(dirname "$git_root")
+
+  # Build worktree path
+  local wt_path="$parent_dir/${repo_name}-wt-${feature}"
+
+  cd "$wt_path" || echo "Worktree not found: $wt_path"
+}
+
+# ============================================================================
 # LOCAL OVERRIDES
 # ============================================================================
 
