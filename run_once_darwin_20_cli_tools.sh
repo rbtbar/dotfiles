@@ -32,6 +32,7 @@ brew_install zoxide
 brew_install direnv
 brew_install ripgrep
 brew_install tmux
+brew_install yazi --HEAD
 
 # Zsh goodies
 brew_install zsh-syntax-highlighting
