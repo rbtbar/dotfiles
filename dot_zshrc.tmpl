@@ -211,6 +211,10 @@ if command -v brew >/dev/null 2>&1; then
   if [[ -d "$BREW_PREFIX/share/zsh-completions" ]]; then
     fpath=("$BREW_PREFIX/share/zsh-completions" $fpath)
   fi
+  # site-functions contains completions installed by Homebrew formulas (e.g., yazi)
+  if [[ -d "$BREW_PREFIX/share/zsh/site-functions" ]]; then
+    fpath=("$BREW_PREFIX/share/zsh/site-functions" $fpath)
+  fi
 fi
 {{ end -}}
 
