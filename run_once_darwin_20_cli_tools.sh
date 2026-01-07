@@ -45,4 +45,10 @@ if ! brew list oh-my-posh &>/dev/null; then
   brew install --formula jandedobbeleer/oh-my-posh/oh-my-posh
 fi
 
+# Tmux plugins
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+  mkdir -p ~/.tmux/plugins
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
+
 echo "[dotfiles] CLI tools setup finished."
