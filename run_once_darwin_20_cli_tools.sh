@@ -35,6 +35,7 @@ brew_install tmux
 brew_install yazi --HEAD
 brew_install aerc
 brew_install fabric-ai
+brew_install w3m
 
 # Zsh goodies
 brew_install zsh-syntax-highlighting
