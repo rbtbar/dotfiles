@@ -42,7 +42,8 @@ brew_install pyenv
 brew_install fnm
 brew_install lazygit
 brew_install git-delta
-brew install jesseduffield/lazydocker/lazydocker
+brew_install jesseduffield/lazydocker/lazydocker
+brew_install ngrok
 
 brew_install_cask docker
 

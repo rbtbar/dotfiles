@@ -33,6 +33,8 @@ brew_install direnv
 brew_install ripgrep
 brew_install tmux
 brew_install yazi --HEAD
+brew_install aerc
+brew_install fabric-ai
 
 # Zsh goodies
 brew_install zsh-syntax-highlighting
