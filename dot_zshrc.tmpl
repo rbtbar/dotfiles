@@ -200,29 +200,15 @@ alias ssh="ssh -F $HOME/.ssh/config"
 # Debian/Ubuntu use different binary names to avoid conflicts
 if command -v batcat >/dev/null 2>&1; then
   alias bat="batcat"
-  alias cat="batcat"
 fi
 
 if command -v fdfind >/dev/null 2>&1; then
   alias fd="fdfind"
-  alias find="fdfind"
-fi
-{{ else -}}
-if command -v bat >/dev/null 2>&1; then
-  alias cat="bat"
-fi
-
-if command -v fd >/dev/null 2>&1; then
-  alias find="fd"
 fi
 {{ end -}}
 
 if command -v eza >/dev/null 2>&1; then
   alias ls="eza --icons=always"
-fi
-
-if command -v nvim >/dev/null 2>&1; then
-  alias vim="nvim"
 fi
 
 # ============================================================================
